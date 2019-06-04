@@ -50,7 +50,6 @@ def WriteVar(value, Var, CurrentUser=False):
             else:
                 logging.warn(r'Deleting "%s" from "%s\%s"' % ( Var, KeyName, path ))
                 Reg.DeleteValue(key, Var)
-            _NotifyWindows()
         except WindowsError as werr:
             logging.error('Unabled to succeed: \n\t%s' % werr)
 
@@ -122,7 +121,12 @@ def ApplyConfig(ConfigPath, CurrentUser=False):
             path_var += "%s;" % env
         path_var = path_var.strip(";")
         WriteVar(path_var, section, CurrentUser)
-    
+
+    try:
+        _NotifyWindows()
+    except WindowsError as werr:
+         logging.error('Unabled to succeed: \n\t%s' % werr)
+
 def InstallConfig(ConfigPath, CurrentUser=True):
     Reg = __import__("_winreg")
     
