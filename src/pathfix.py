@@ -97,23 +97,27 @@ def ExportToConfig(ConfigPath, EnvVars = None, CurrentUser=False):
                     v_name, v_data, v_data_type = Reg.EnumValue(key, index)
                     logging.info('{}: {}'. format(index, v_name))
                     EnvVars.append(v_name)
-                    index += 1        
+                    index += 1
             except WindowsError as e:
                 logging.info('error: {}'.format(e))
                 pass
     
     for Envs in os.environ:
         if EnvVars and not Envs in EnvVars:
+            logging.info('skipping {}'.format(Envs))
             continue
             
         config.add_section(Envs)
         Env_set = set()
         index = 0
         for env in os.environ[Envs].split(";"):
-            if env.lower() in Env_set: continue
+            if env.lower() in Env_set:
+                logging.info('skipping {}: {}'.format(index, env))
+                index += 1
+                continue
             Env_set.add(env.lower())
             if env:
-                logging.info('{}: {}'. format(index, env))
+                logging.info('adding {}: {}'.format(index, env))
                 config.set(Envs, str(index), env)
                 index += 1
         
