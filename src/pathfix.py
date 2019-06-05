@@ -77,7 +77,7 @@ def PreviewConfig(ConfigPath):
         for key, env in config.items(section):
             print('  ', env)
     
-def ExportToConfig(ConfigPath, EnvVars = None, CurrentUser=False):
+def ExportToConfig(ConfigPath, EnvVars=None, CurrentUser=False):
     """ 
     Exports current variables to the file at ConfigPath
     If file is not found, a new one is created
@@ -104,7 +104,7 @@ def ExportToConfig(ConfigPath, EnvVars = None, CurrentUser=False):
     
     for Envs in os.environ:
         if EnvVars and not Envs in EnvVars:
-            logging.info('skipping {}'.format(Envs))
+            logging.info('skipping var {}'.format(Envs))
             continue
             
         config.add_section(Envs)
@@ -181,6 +181,7 @@ def main():
     parser.add_argument("-a",action="store", dest='apply', help='apply the config to environment variables')
     parser.add_argument("-l",action="store", dest='list', default=None, help='display the current contents of variable')
     parser.add_argument("-e",action="store", dest='export', help='writes current environment variables to config')
+    parser.add_argument("-n",action="store", dest='names', help='choose environment variables to operate on')
     parser.add_argument("-p",action="store", dest='preview', help='parses and prints the config without modifying the environment')
     parser.add_argument("-c",action="store_true", dest='current', default=False, help='Limit applied changes to current user (Defaults to all users)')
     parser.add_argument("-i",action="store", dest='install', help='apply the config to environment variables on every startup')
@@ -193,8 +194,11 @@ def main():
         logging.basicConfig(level=logging.WARN)
     else:
         logging.basicConfig(filename=os.path.join(CUR_DIR, 'pathfix.log'), level=logging.INFO)
-        
-        
+
+    envvars = None
+    if args.names:
+        envvars = [name.strip() for name in args.names.split(',')]
+
     logging.info("Running %s at %s", "{}".format(args), time.ctime())
     if args.list:
         ListVariable(args.list)
@@ -205,7 +209,7 @@ def main():
         return
     
     if args.export:
-        ExportToConfig(args.export, CurrentUser=args.current)
+        ExportToConfig(args.export, args.names, CurrentUser=args.current)
         return
     
     if args.apply:
