@@ -19,6 +19,9 @@ LRESULT = LPARAM
 
 config = ConfigParser(allow_no_value=True)
 
+import win32gui, win32con
+
+
 def _NotifyWindows():
     SendMessageTimeout = ctypes.windll.user32.SendMessageTimeoutW
     SendMessageTimeout.argtypes = HWND, UINT, WPARAM, c_wchar_p, UINT, UINT, UINT
@@ -26,7 +29,11 @@ def _NotifyWindows():
     HWND_BROADCAST = 0xFFFF
     WM_SETTINGCHANGE = 0x1A
     SMTO_NORMAL = 0x000
-    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 'Environment', SMTO_NORMAL, 10, 0)
+    logging.info(r'Broadcasting environment change')
+    # SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 'Environment', SMTO_NORMAL, 10, 0)
+    rc, dwReturnValue = win32gui.SendMessageTimeout(win32con.HWND_BROADCAST,\
+                                                    win32con.WM_SETTINGCHANGE,\
+                                                    0, "Environment", win32con.SMTO_ABORTIFHUNG, 5000)
 
 def WriteVar(value, Var, CurrentUser=False):
     """ Help? """
