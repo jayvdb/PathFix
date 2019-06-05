@@ -103,6 +103,8 @@ def ExportToConfig(ConfigPath, EnvVars=None, CurrentUser=False):
                 pass
     
     for Envs in os.environ:
+        logging.info('Processing {}'.format(Envs))
+
         if EnvVars and not Envs in EnvVars:
             logging.info('skipping var {}'.format(Envs))
             continue
@@ -110,7 +112,10 @@ def ExportToConfig(ConfigPath, EnvVars=None, CurrentUser=False):
         config.add_section(Envs)
         Env_set = set()
         index = 0
+        value = os.environ[Envs]
+        logging.info('Splitting {}: {}'.format(Envs, value))
         for env in os.environ[Envs].split(";"):
+            logging.info('processing {} {}: {}'.format(Envs, index, env))
             if env.lower() in Env_set:
                 logging.info('skipping {}: {}'.format(index, env))
                 index += 1
